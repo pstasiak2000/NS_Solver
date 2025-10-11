@@ -4,7 +4,7 @@ CFLAGS	=	-O2 -Wall -I../include
 LDFLAGS	=	-lfftw3 -lm
 
 # -- Source & object files
-SRCS = $(NAME).c wavenumbers.c IC.c fields.c 
+SRCS = $(NAME).c wavenumbers.c IC.c fields.c vector_ops.c
 OBJS = $(SRCS:.c=.o)
 
 # -- Default target ---

@@ -13,10 +13,15 @@ double Lx = 1.0;
 double Ly = 1.0;
 double Lz = 1.0;
 
-
+/*  Set the initial condition of the vortex flow
+    [1]  --- Taylor-Green flow
+*/
+int init_cond = 1; // Set the inital condition of NS here
 
 int main() {
+    
     int N = Nx * Ny * Nz;
+
     Lx *= 2*M_PI;
     Ly *= 2*M_PI;
     Lz *= 2*M_PI;
@@ -26,9 +31,7 @@ int main() {
     RealField *v = create_real_field(Nx,Ny,Nz);
 
     // FFTW outputs: Complex arrays of size NX * NY * (NZ/2 + 1)
-    ComplexField *cv = create_complex_field(Nx,Ny,Nz);    // fftw_complex *cx = fftw_malloc(sizeof(fftw_complex) * Nx * Ny * (Nz/2 + 1));
-    // fftw_complex *cy = fftw_malloc(sizeof(fftw_complex) * Nx * Ny * (Nz/2 + 1));
-    // fftw_complex *cz = fftw_malloc(sizeof(fftw_complex) * Nx * Ny * (Nz/2 + 1));
+    ComplexField *cv = create_complex_field(Nx,Ny,Nz);    
 
     // Create FFTW plans
     // fftw_plan plan_vx = fftw_plan_dft_r2c_3d(Nx, Ny, Nz, vx, cx, FFTW_ESTIMATE);
@@ -39,7 +42,8 @@ int main() {
     Wavenumbers *kk = create_wavenumbers(Nx,Ny,Nz,Lx,Ly,Lz);
 
     // Initialising a Taylor-Green flow
-    init_TG(v);
+    set_initial_condition(v, init_cond);
+    
 
     // Executing FFTs
     // fftw_execute(plan_vx);
@@ -47,7 +51,7 @@ int main() {
     // fftw_execute(plan_vz);
 
 
-
+    double *Ekin = dot_product_real(v,v);
 
 
     

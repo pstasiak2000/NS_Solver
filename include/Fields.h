@@ -26,3 +26,13 @@ ComplexField *create_complex_field(size_t Nx, size_t Ny, size_t Nz);
 void free_complex_field(ComplexField *f);
 
 #endif // !FIELDS_H
+
+#ifndef VECTOR_OPS_H
+#define VECTOR_OPS_H
+
+#include <fftw3.h>
+#include <wavenumbers.h>
+
+double *dot_product_real(RealField *A, RealField *B);
+
+#endif
