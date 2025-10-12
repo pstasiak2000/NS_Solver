@@ -5,9 +5,9 @@
 #include "project.h"
 #include <omp.h>
 
-#define Nx 16
-#define Ny 16
-#define Nz 16
+int Nx = 16;
+int Ny = 16;
+int Nz = 16;
 
 // Box size, in units of 2*pi
 double Lx = 1.0;
@@ -22,6 +22,7 @@ int init_cond = 1; // Set the inital condition of NS here
 int main() {
     
     int N = Nx * Ny * Nz;
+
 
     Lx *= 2*M_PI;
     Ly *= 2*M_PI;
@@ -65,8 +66,10 @@ int main() {
 
     compute_curl_fftw(comega,cv,kk);
 
-
-
+    execute_fftw_SP(plan_SP, comega, omega);
+    
+    double enstr = (double) dot_product_2_sum(omega,omega) / (Nx*Ny*Nz);
+    printf("Enstrophy = %f\n", enstr);
 
     //  Clean up
     free_real_field(v);
@@ -76,6 +79,7 @@ int main() {
     free_complex_field(comega);
 
     fftw_destroy_plan(plan_PS);
+    fftw_destroy_plan(plan_SP);
 
     free_wavenumbers(kk);
     return 0;
