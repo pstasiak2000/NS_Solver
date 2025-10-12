@@ -27,9 +27,10 @@ void free_real_field(RealField *f) {
 ComplexField *create_complex_field(size_t Nx, size_t Ny, size_t Nz){
     ComplexField *f = malloc(sizeof(ComplexField));
     if(!f) return NULL;
-        
-    f->Nx = Nx; f->Ny = Ny; f->Nz = Nz;
+    
     size_t NzC = Nz/2 + 1;  // FFTW R2C length
+    f->Nx = Nx; f->Ny = Ny; f->Nz = NzC;
+    
     f->x = NULL;
     f->y = NULL;
     f->z = NULL;

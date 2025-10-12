@@ -6,26 +6,31 @@
 #define TWO_PI 6.283185307179586
 
 void execute_fftw_PS(fftw_plan plan, RealField *f, ComplexField *cf){
-    fftw_execute_dft_r2c(plan, f->x, cf->x);
-    fftw_execute_dft_r2c(plan, f->y, cf->y);
-    fftw_execute_dft_r2c(plan, f->z, cf->z);
-}
-
-void execute_fftw_SP(fftw_plan plan, ComplexField *cf, RealField *f){
     size_t Nx = f->Nx;
     size_t Ny = f->Ny;
     size_t Nz = f->Nz;
+    size_t NzC = cf->Nz;
 
+    double N = Nx*Ny*Nz;
+
+    fftw_execute_dft_r2c(plan, f->x, cf->x);
+    fftw_execute_dft_r2c(plan, f->y, cf->y);
+    fftw_execute_dft_r2c(plan, f->z, cf->z);
+    
+    // Normalize the FFT field
+    for (size_t i = 0; i < Nx*Ny*NzC; i++)
+    {
+        cf->x[i][0] /= N; cf->x[i][1] /= N;
+        cf->y[i][0] /= N; cf->y[i][1] /= N;
+        cf->z[i][0] /= N; cf->z[i][1] /= N;
+    }
+    
+}
+
+void execute_fftw_SP(fftw_plan plan, ComplexField *cf, RealField *f){
     fftw_execute_dft_c2r(plan, cf->x, f->x);
     fftw_execute_dft_c2r(plan, cf->y, f->y);
     fftw_execute_dft_c2r(plan, cf->z, f->z);
-
-    #pragma omp parallel for 
-    for (size_t i = 0; i < Nx*Ny*Nz; i++){
-        f->x[i] /= Nx*Ny*Nz;
-        f->y[i] /= Nx*Ny*Nz;
-        f->z[i] /= Nx*Ny*Nz;
-    }
 }
 
 Wavenumbers *create_wavenumbers(size_t Nx, size_t Ny, size_t Nz, double Lx, double Ly, double Lz){

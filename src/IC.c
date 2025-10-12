@@ -20,8 +20,8 @@ void init_TG(RealField *f){
     size_t Ny = f->Ny;
     size_t Nz = f->Nz;
     size_t Nx = f->Nx;
-
-
+    
+    // #pragma omp parallel for collapse(3)
     for (size_t i = 0; i < Nx; i++){
         for (size_t j = 0; j < Ny; j++){
             for (size_t k = 0; k < Nz; k++){

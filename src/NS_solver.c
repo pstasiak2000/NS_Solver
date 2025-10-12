@@ -54,18 +54,18 @@ int main() {
 
     // Initialising a Taylor-Green flow
     set_initial_condition(v, init_cond);
-    
+
 
     // Executing FFT
     execute_fftw_PS(plan_PS, v, cv);
 
+    // printf("Max value = %f\n", max(dot_product_c2r(cv,cv),kk->Nx,kk->Ny,kk->Nz));
+
     double *cv_2 = dot_product_c2r(cv,cv);
     double *Ekin = spec1D(cv_2, kk);
 
-
-    
     for (size_t i = 0; i < kk->Nx; i++){
-        printf("k=%2d, E_k=%10.5e\n", i, Ekin[i]);
+        printf("k=%2d, E_k=%10.5e\n", i, (double) Ekin[i]);
     }
     
 
