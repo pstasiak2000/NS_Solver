@@ -18,7 +18,7 @@ double Lz = 1.0;
     [1]  --- Taylor-Green flow
     [2]  --- ABC flow
 */
-int init_cond = 2; // Set the inital condition of NS here
+int init_cond = 1; // Set the inital condition of NS here
 
 int main() {
     
