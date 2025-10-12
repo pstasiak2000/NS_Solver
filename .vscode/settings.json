@@ -5,6 +5,8 @@
         "fields.h": "c",
         "omp.h": "c",
         "algorithm": "c",
-        "format": "c"
+        "format": "c",
+        "output.h": "c",
+        "outputs.h": "c"
     }
 }

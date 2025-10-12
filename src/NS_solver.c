@@ -5,9 +5,9 @@
 #include "project.h"
 #include <omp.h>
 
-int Nx = 16;
-int Ny = 16;
-int Nz = 16;
+int Nx = 128;
+int Ny = 128;
+int Nz = 128;
 
 // Box size, in units of 2*pi
 double Lx = 1.0;
@@ -56,20 +56,23 @@ int main() {
 
 
     // Executing FFT
-    execute_fftw_PS(plan_PS, v, cv);
+    // execute_fftw_PS(plan_PS, v, cv);
 
     // printf("Max value = %f\n", max(dot_product_c2r(cv,cv),kk->Nx,kk->Ny,kk->Nz));
 
-    double *cv_2 = dot_product_c2r(cv,cv);
-    double *Ekin = spec1D(cv_2, kk);
+    // double *cv_2 = dot_product_c2r(cv,cv);
+    // double *Ekin = spec1D(cv_2, kk);
 
-    printf("---------------------\n");
-    printf("|  k  |     E(k)    |\n");
-    printf("---------------------\n");
-    for (size_t i = 0; i < kk->Nx; i++){
-        printf("| %3d | %10.5f |\n", i, (double) Ekin[i]);
-    }
-    printf("---------------------\n");
+    // printf("---------------------\n");
+    // printf("|  k  |     E(k)    |\n");
+    // printf("---------------------\n");
+    // for (size_t i = 0; i < kk->Nx; i++){
+    //     printf("| %3d | %10.5f |\n", i, (double) Ekin[i]);
+    // }
+    // printf("---------------------\n");
+
+    save_vecfield_2_bin(v, 0);
+    printf("Saved vector field to binary!\n");
 
     //  Clean up
     free_real_field(v);

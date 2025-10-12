@@ -11,6 +11,7 @@ void set_initial_condition(RealField *f, int init_cond){
         case 2:
             printf("ABC flow initial condition\n");
             init_ABC(f);
+            break;
         default:
             printf("Unknown initial condition: %d\n", init_cond);
             break;

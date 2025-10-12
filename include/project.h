@@ -6,6 +6,7 @@
 #include "wavenumbers.h"
 #include "IC.h"
 #include "field_ops.h"
+#include "outputs.h"
 
 
 #endif
