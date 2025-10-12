@@ -17,9 +17,9 @@ void set_initial_condition(RealField *f, int init_cond){
 
 // Creates a Taylor-Green initial vector field
 void init_TG(RealField *f){
-    int Nx = f->Nx;
-    int Ny = f->Ny;
-    int Nz = f->Nz;
+    size_t Ny = f->Ny;
+    size_t Nz = f->Nz;
+    size_t Nx = f->Nx;
 
     for (size_t i = 0; i < Nx; i++){
         for (size_t j = 0; j < Ny; j++){

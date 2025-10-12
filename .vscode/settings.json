@@ -2,6 +2,8 @@
     "files.associations": {
         "stdlib.h": "c",
         "wavenumbers.h": "c",
-        "fields.h": "c"
+        "fields.h": "c",
+        "omp.h": "c",
+        "algorithm": "c"
     }
 }

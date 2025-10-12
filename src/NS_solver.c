@@ -3,6 +3,7 @@
 #include <math.h>
 #include <fftw3.h>
 #include "project.h"
+#include <omp.h>
 
 #define Nx 16
 #define Ny 16
@@ -25,18 +26,29 @@ int main() {
     Lx *= 2*M_PI;
     Ly *= 2*M_PI;
     Lz *= 2*M_PI;
+
+
+
+    printf("|----------------------------------------------------|\n");
+    printf("|--- Running pseudo-spectral Navier-Stokes solver ---|\n");
+    printf("|----------------------------------------------------|\n");
+    printf("\n");
+    printf("Max threads : %d\n", omp_get_max_threads());
+    printf("Available processors: %d\n", omp_get_num_procs());
+
     printf("Domain size is (%f,%f,%f)\n", Lx, Ly, Lz);
 
     // Allocate the memory for the real 3D fields here
     RealField *v = create_real_field(Nx,Ny,Nz);
+    RealField *omega = create_real_field(Nx,Ny,Nz);
 
     // FFTW outputs: Complex arrays of size NX * NY * (NZ/2 + 1)
     ComplexField *cv = create_complex_field(Nx,Ny,Nz);    
-
+    ComplexField *comega = create_complex_field(Nx,Ny,Nz); 
     // Create FFTW plans
-    // fftw_plan plan_vx = fftw_plan_dft_r2c_3d(Nx, Ny, Nz, vx, cx, FFTW_ESTIMATE);
-    // fftw_plan plan_vy = fftw_plan_dft_r2c_3d(Nx, Ny, Nz, vy, cx, FFTW_ESTIMATE);
-    // fftw_plan plan_vz = fftw_plan_dft_r2c_3d(Nx, Ny, Nz, vz, cx, FFTW_ESTIMATE);
+
+    fftw_plan plan_PS = fftw_plan_dft_r2c_3d(Nx, Ny, Nz, v->x, cv->x, FFTW_ESTIMATE);
+    fftw_plan plan_SP = fftw_plan_dft_c2r_3d(Nx, Ny, Nz, cv->x, v->x, FFTW_ESTIMATE);
 
     // Create the wavenumbers
     Wavenumbers *kk = create_wavenumbers(Nx,Ny,Nz,Lx,Ly,Lz);
@@ -45,23 +57,25 @@ int main() {
     set_initial_condition(v, init_cond);
     
 
-    // Executing FFTs
-    // fftw_execute(plan_vx);
-    // fftw_execute(plan_vy);
-    // fftw_execute(plan_vz);
+    // Executing FFT
+    execute_fftw_PS(plan_PS, v, cv);
+
+    double E_kin = (double) dot_product_2_sum(v,v) / (2.0 * Nx * Ny* Nz) ;
+    printf("Kinetic energy = %f\n", E_kin);
+
+    compute_curl_fftw(comega,cv,kk);
 
 
-    double *Ekin = dot_product_real(v,v);
 
 
-    
     //  Clean up
     free_real_field(v);
     free_complex_field(cv);
 
-    // fftw_destroy_plan(plan_vx);
-    // fftw_destroy_plan(plan_vy);
-    // fftw_destroy_plan(plan_vz);
+    free_real_field(omega);
+    free_complex_field(comega);
+
+    fftw_destroy_plan(plan_PS);
 
     free_wavenumbers(kk);
     return 0;
