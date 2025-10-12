@@ -16,8 +16,9 @@ double Lz = 1.0;
 
 /*  Set the initial condition of the vortex flow
     [1]  --- Taylor-Green flow
+    [2]  --- ABC flow
 */
-int init_cond = 1; // Set the inital condition of NS here
+int init_cond = 2; // Set the inital condition of NS here
 
 int main() {
     
@@ -39,11 +40,9 @@ int main() {
 
     // Allocate the memory for the real 3D fields here
     RealField *v = create_real_field(Nx,Ny,Nz);
-    // RealField *omega = create_real_field(Nx,Ny,Nz);
 
     // FFTW outputs: Complex arrays of size NX * NY * (NZ/2 + 1)
-    ComplexField *cv = create_complex_field(Nx,Ny,Nz);    
-    // ComplexField *comega = create_complex_field(Nx,Ny,Nz); 
+    ComplexField *cv = create_complex_field(Nx,Ny,Nz);     
 
     // Create FFTW plans
     fftw_plan plan_PS = fftw_plan_dft_r2c_3d(Nx, Ny, Nz, v->x, cv->x, FFTW_ESTIMATE);
@@ -64,24 +63,18 @@ int main() {
     double *cv_2 = dot_product_c2r(cv,cv);
     double *Ekin = spec1D(cv_2, kk);
 
+    printf("---------------------\n");
+    printf("|  k  |     E(k)    |\n");
+    printf("---------------------\n");
     for (size_t i = 0; i < kk->Nx; i++){
-        printf("k=%2d, E_k=%10.5e\n", i, (double) Ekin[i]);
+        printf("| %3d | %10.5f |\n", i, (double) Ekin[i]);
     }
-    
-
-    // compute_curl_fftw(comega,cv,kk);
-
-    // execute_fftw_SP(plan_SP, comega, omega);
-    
-    // double enstr = (double) dot_product_2_sum(omega,omega) / (N);
-    // printf("Enstrophy = %f\n", enstr);
+    printf("---------------------\n");
 
     //  Clean up
     free_real_field(v);
     free_complex_field(cv);
 
-    // free_real_field(omega);
-    // free_complex_field(comega);
 
     fftw_destroy_plan(plan_PS);
     fftw_destroy_plan(plan_SP);
