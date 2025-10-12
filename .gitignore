@@ -1,2 +1,10 @@
 *.o
 *.swp
+
+#Ignore data files
+*.dat
+*.vti
+*.vtk
+*.pvd
+*.log 
+*.out
