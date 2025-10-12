@@ -23,13 +23,11 @@ int main() {
     
     int N = Nx * Ny * Nz;
 
-
     Lx *= 2*M_PI;
     Ly *= 2*M_PI;
     Lz *= 2*M_PI;
 
-
-
+    printf("\n");
     printf("|----------------------------------------------------|\n");
     printf("|--- Running pseudo-spectral Navier-Stokes solver ---|\n");
     printf("|----------------------------------------------------|\n");
@@ -41,13 +39,13 @@ int main() {
 
     // Allocate the memory for the real 3D fields here
     RealField *v = create_real_field(Nx,Ny,Nz);
-    RealField *omega = create_real_field(Nx,Ny,Nz);
+    // RealField *omega = create_real_field(Nx,Ny,Nz);
 
     // FFTW outputs: Complex arrays of size NX * NY * (NZ/2 + 1)
     ComplexField *cv = create_complex_field(Nx,Ny,Nz);    
-    ComplexField *comega = create_complex_field(Nx,Ny,Nz); 
-    // Create FFTW plans
+    // ComplexField *comega = create_complex_field(Nx,Ny,Nz); 
 
+    // Create FFTW plans
     fftw_plan plan_PS = fftw_plan_dft_r2c_3d(Nx, Ny, Nz, v->x, cv->x, FFTW_ESTIMATE);
     fftw_plan plan_SP = fftw_plan_dft_c2r_3d(Nx, Ny, Nz, cv->x, v->x, FFTW_ESTIMATE);
 
@@ -61,22 +59,29 @@ int main() {
     // Executing FFT
     execute_fftw_PS(plan_PS, v, cv);
 
-    double E_kin = (double) dot_product_2_sum(v,v) / (2.0 * Nx * Ny* Nz) ;
-    printf("Kinetic energy = %f\n", E_kin);
+    double *cv_2 = dot_product_c2r(cv,cv);
+    double *Ekin = spec1D(cv_2, kk);
 
-    compute_curl_fftw(comega,cv,kk);
 
-    execute_fftw_SP(plan_SP, comega, omega);
     
-    double enstr = (double) dot_product_2_sum(omega,omega) / (Nx*Ny*Nz);
-    printf("Enstrophy = %f\n", enstr);
+    for (size_t i = 0; i < kk->Nx; i++){
+        printf("k=%2d, E_k=%10.5e\n", i, Ekin[i]);
+    }
+    
+
+    // compute_curl_fftw(comega,cv,kk);
+
+    // execute_fftw_SP(plan_SP, comega, omega);
+    
+    // double enstr = (double) dot_product_2_sum(omega,omega) / (N);
+    // printf("Enstrophy = %f\n", enstr);
 
     //  Clean up
     free_real_field(v);
     free_complex_field(cv);
 
-    free_real_field(omega);
-    free_complex_field(comega);
+    // free_real_field(omega);
+    // free_complex_field(comega);
 
     fftw_destroy_plan(plan_PS);
     fftw_destroy_plan(plan_SP);

@@ -1,4 +1,4 @@
-#include "Fields.h"
+#include "fields.h"
 #include <stdlib.h>
 
 // Allocate memory for a 3D Real field

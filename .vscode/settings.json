@@ -4,6 +4,7 @@
         "wavenumbers.h": "c",
         "fields.h": "c",
         "omp.h": "c",
-        "algorithm": "c"
+        "algorithm": "c",
+        "format": "c"
     }
 }

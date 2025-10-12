@@ -45,10 +45,9 @@ Wavenumbers *create_wavenumbers(size_t Nx, size_t Ny, size_t Nz, double Lx, doub
          return NULL;  
     } //Check if there is enough memory to allocate the arrays, if not return NULL
 
-    for (size_t i = 0; i < kk->Nx; i++){ // Allocate kx
+    for (size_t i = 0; i < kk->Nx; i++) // Allocate kx
         kk->kx[i] = (i <= (kk->Nx)/2) ? (TWO_PI * i / Lx) : (TWO_PI * ( (int) i - (int) kk->Nx) / Lx);
         
-    }
 
     for (size_t i = 0; i < kk->Ny; i++) // Allocate ky
         kk->ky[i] = (i <= (kk->Ny)/2) ? (TWO_PI * i / Ly) : (TWO_PI * ((int) i - (int) kk->Ny) / Ly);
@@ -59,38 +58,37 @@ Wavenumbers *create_wavenumbers(size_t Nx, size_t Ny, size_t Nz, double Lx, doub
 
     return kk;
 }
-
+// Free wavenumbers from memory
 void free_wavenumbers(Wavenumbers *kk){
     if(!kk) return;
     free(kk->kx); free(kk->ky); free(kk->kz);
     free(kk);
 }
 
+// Compute the 1D spectrum from 3D field in Fourier space (sum over concentric shells)
+double *spec1D(double *cf, Wavenumbers *kk){
+    double *spec = calloc(kk->Nx, sizeof(double));
+    int Nx = kk->Nx;
+    int Ny = kk->Ny;
+    int Nz = kk->Nz;
 
-// Compute the curl of a vector field in Fourier Space
-void compute_curl_fftw(ComplexField *comega, ComplexField *cv, Wavenumbers *kk){
-
-    fftw_complex *vx = cv->x;
-    fftw_complex *vy = cv->y;
-    fftw_complex *vz = cv->z;
-
-    #pragma omp parallel for collapse(3)
-    for (size_t i = 0; i < kk->Nx; i++)
-    for (size_t j = 0; j < kk->Ny; j++)
-    for (size_t k = 0; k < kk->Nz; k++){
-        int idx = (i*kk->Ny + j) * kk->Nz + k;
+    for (size_t i = 0; i < Nx; i++)
+    for (size_t j = 0; j < Ny; j++)
+    for (size_t k = 0; k < Nz; k++){
+        int idx = (i*Ny + j) * Nz + k;
+        double fac = 2.0;
+        if(k==0) fac = 1.0;
 
         double kx = kk->kx[i];
         double ky = kk->ky[j];
         double kz = kk->kz[k];
+        
+        double ks = pow((kx*kx) + (ky*ky) + (kz*kz),0.5);
+        int iks = fmin(floor(ks)+1,Nz);
 
-        comega->x[idx][0] =  ky * vz[idx][1] - kz * vy[idx][1];
-        comega->x[idx][1] = -ky * vz[idx][0] + kz * vy[idx][0];
-
-        comega->y[idx][0] =  kz * vx[idx][1] - kx * vz[idx][1];
-        comega->y[idx][1] = -kz * vx[idx][0] + kx * vz[idx][0];
-
-        comega->z[idx][0] =  kx * vy[idx][1] - ky * vx[idx][1];
-        comega->z[idx][1] = -kx * vy[idx][0] + ky * vx[idx][0];
+        spec[iks] += (double) 0.5 * fac *cf[idx];
     }
+    
+
+    return spec;
 }

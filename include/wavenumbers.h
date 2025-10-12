@@ -1,7 +1,7 @@
 #ifndef WAVENUMBERS
 #define WAVENUMBERS
 
-#include "Fields.h"
+#include "fields.h"
 #include <fftw3.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -24,7 +24,6 @@ void execute_fftw_SP(fftw_plan plan, ComplexField *cf, RealField *f);
 Wavenumbers *create_wavenumbers(size_t Nx, size_t Ny, size_t Nz, double Lx, double Ly, double Lz);
 void free_wavenumbers(Wavenumbers *kk);
 
-void compute_curl_fftw(ComplexField *comega, ComplexField *cv, Wavenumbers *kk);
 
-
+double *spec1D(double *cf, Wavenumbers *kk);
 #endif

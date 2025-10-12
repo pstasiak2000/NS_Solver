@@ -2,9 +2,10 @@
 #define PROJECT_H
 
 #include <fftw3.h>
-
-#include "Fields.h"
-#include "IC.h"
+#include "fields.h"
 #include "wavenumbers.h"
+#include "IC.h"
+#include "field_ops.h"
+
 
 #endif
