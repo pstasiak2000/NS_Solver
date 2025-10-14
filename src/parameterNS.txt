@@ -1,0 +1,20 @@
+// Resolution
+Nx=32 
+Ny=32
+Nz=32
+
+// Box size (in units of 2*pi)
+Lx=1.0
+Ly=1.0
+Lz=1.0
+
+nu=0.04 // Numerical viscosity
+dt=0.0001 // Step size
+steps=1 // Number of steps 
+
+//  Set the initial condition of the vortex flow
+//  [1]  --- Taylor-Green flow
+//  [2]  --- ABC flow
+//
+init_cond = 2 // Set the initial condition here
+shots = 100 // Save every shots

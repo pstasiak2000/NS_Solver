@@ -127,3 +127,50 @@ void compute_curl_fftw(ComplexField *comega, ComplexField *cv, Wavenumbers *kk){
     }
 }
 
+// Compute the gradient of f_x
+void Dx(fftw_complex *Aout, fftw_complex *Ain, Wavenumbers *kk){
+
+    #pragma omp parallel for collapse(3)
+    for (size_t i = 0; i < kk->Nx; i++)
+    for (size_t j = 0; j < kk->Ny; j++)
+    for (size_t k = 0; k < kk->Nz; k++){
+        int idx = (i*kk->Ny + j) * kk->Nz + k;
+
+        double kx = kk->kx[i];
+    
+        Aout[idx][0] = -kx * Ain[idx][1];
+        Aout[idx][1] =  kx * Ain[idx][0];
+    }
+}
+
+// Compute the gradient of f_x
+void Dy(fftw_complex *Aout, fftw_complex *Ain, Wavenumbers *kk){
+
+    #pragma omp parallel for collapse(3)
+    for (size_t i = 0; i < kk->Nx; i++)
+    for (size_t j = 0; j < kk->Ny; j++)
+    for (size_t k = 0; k < kk->Nz; k++){
+        int idx = (i*kk->Ny + j) * kk->Nz + k;
+
+        double ky = kk->ky[j];
+    
+        Aout[idx][0] = -ky * Ain[idx][1];
+        Aout[idx][1] =  ky * Ain[idx][0];
+    }
+}
+
+// Compute the gradient of f_x
+void Dz(fftw_complex *Aout, fftw_complex *Ain, Wavenumbers *kk){
+
+    #pragma omp parallel for collapse(3)
+    for (size_t i = 0; i < kk->Nx; i++)
+    for (size_t j = 0; j < kk->Ny; j++)
+    for (size_t k = 0; k < kk->Nz; k++){
+        int idx = (i*kk->Ny + j) * kk->Nz + k;
+
+        double kz = kk->ky[k];
+    
+        Aout[idx][0] = -kz * Ain[idx][1];
+        Aout[idx][1] =  kz * Ain[idx][0];
+    }
+}

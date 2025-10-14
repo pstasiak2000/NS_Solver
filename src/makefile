@@ -4,7 +4,7 @@ CFLAGS	=	-O2 -Wall -I../include
 LDFLAGS	=	-lfftw3 -fopenmp -lm
 
 # -- Source & object files
-SRCS = $(NAME).c wavenumbers.c IC.c fields.c field_ops.c outputs.c
+SRCS = $(NAME).c params.c wavenumbers.c IC.c fields.c field_ops.c  NS_drive.c outputs.c
 OBJS = $(SRCS:.c=.o)
 
 # -- Default target ---

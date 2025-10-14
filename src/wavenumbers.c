@@ -18,6 +18,7 @@ void execute_fftw_PS(fftw_plan plan, RealField *f, ComplexField *cf){
     fftw_execute_dft_r2c(plan, f->z, cf->z);
     
     // Normalize the FFT field
+    #pragma omp parallel for
     for (size_t i = 0; i < Nx*Ny*NzC; i++)
     {
         cf->x[i][0] /= N; cf->x[i][1] /= N;
@@ -35,12 +36,24 @@ void execute_fftw_SP(fftw_plan plan, ComplexField *cf, RealField *f){
 
 Wavenumbers *create_wavenumbers(size_t Nx, size_t Ny, size_t Nz, double Lx, double Ly, double Lz){
     Wavenumbers *kk = malloc(sizeof(Wavenumbers));
+
     if (!kk) return NULL; //Checks if there is enough memory to allocate the wavenumber structure, if not return NULL
 
     kk->Nx = Nx;
     kk->Ny = Ny;
     kk->Nz = Nz/2+1;
 
+    // Define dummy arrays for the real and complex to define the plans within the wavenumbers structure
+    double *v = malloc(Nx*Ny*Nz * sizeof(double));
+    if(!v) return NULL;
+    fftw_complex *cv = fftw_malloc(sizeof(fftw_complex) * Nx * Ny * (kk->Nz));  
+    if(!cv) return NULL;
+
+    // Define the plans here and then free the arrays to save space
+    kk->plan_PS = fftw_plan_dft_r2c_3d(Nx, Ny, Nz, v, cv, FFTW_ESTIMATE);
+    kk->plan_SP = fftw_plan_dft_c2r_3d(Nx, Ny, Nz, cv, v, FFTW_ESTIMATE);
+
+    // Assign memory for the wavenumbers
     kk->kx = malloc(kk->Nx * sizeof(double));
     kk->ky = malloc(kk->Ny * sizeof(double));
     kk->kz = malloc(kk->Nz * sizeof(double));
@@ -59,7 +72,25 @@ Wavenumbers *create_wavenumbers(size_t Nx, size_t Ny, size_t Nz, double Lx, doub
         
     for (size_t i = 0; i < kk->Nz; i++) // Allocate kz
         kk->kz[i] = TWO_PI * i / Lz;
-    
+     
+    free(v);
+    free(cv);
+
+    // Define the wave-vectors to kill for de-aliasing
+    kk->kill = calloc(sizeof(double),Nx*Ny*(Nz/2+1));
+    if(!kk->kill) return NULL;
+
+    for (size_t i = 0; i < kk->Nx; i++)
+    for (size_t j = 0; j < kk->Ny; j++)
+    for (size_t k = 0; k < kk->Nz; k++){
+        int idx = (i*kk->Ny + j) * kk->Nz + k;
+        // double kx = kk->kx[i];
+        // double ky = kk->ky[j];
+        // double kz = kk->kz[k];
+
+        if(i < (double) Nx/3 || j < (double) Ny/3 || k < (double) Nz/3)
+            kk->kill[idx] = 1.0;
+    }
 
     return kk;
 }
@@ -67,6 +98,9 @@ Wavenumbers *create_wavenumbers(size_t Nx, size_t Ny, size_t Nz, double Lx, doub
 void free_wavenumbers(Wavenumbers *kk){
     if(!kk) return;
     free(kk->kx); free(kk->ky); free(kk->kz);
+    fftw_destroy_plan(kk->plan_PS);
+    fftw_destroy_plan(kk->plan_SP);
+    free(kk->kill);
     free(kk);
 }
 

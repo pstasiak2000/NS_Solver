@@ -14,7 +14,11 @@ typedef struct {
     double *kx;
     double *ky;
     double *kz;
+    fftw_plan plan_PS;
+    fftw_plan plan_SP;
+    double *kill; // Defines the wavevectors to kill during de-aliasing
 } Wavenumbers;
+
 
 //FFTs for fields
 void execute_fftw_PS(fftw_plan plan, RealField *f, ComplexField *cf);

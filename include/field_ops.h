@@ -13,5 +13,9 @@ double dot_product_2_sum(RealField *A, RealField *B);
 
 void compute_curl_fftw(ComplexField *comega, ComplexField *cv, Wavenumbers *kk);
 
+void Dx(fftw_complex *Aout, fftw_complex *Ain, Wavenumbers *kk);
+void Dy(fftw_complex *Aout, fftw_complex *Ain, Wavenumbers *kk);
+void Dz(fftw_complex *Aout, fftw_complex *Ain, Wavenumbers *kk);
+
 double max(double *f, size_t Nx, size_t Ny, size_t Nz);
 #endif
