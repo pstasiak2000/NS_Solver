@@ -10,14 +10,18 @@ extern double Lx;
 extern double Ly;
 extern double Lz;
 
+extern int steps; // Total number of steps
 extern double dt;
+extern int shots; // Save every shots
+
 /*  Set the initial condition of the vortex flow
     [1]  --- Taylor-Green flow
     [2]  --- ABC flow
 */
 extern int init_cond; // Set the inital condition of NS here
 extern double nu; // Numerical viscosity
-extern int shots; // Save every shots
+
+
 
 // Function to read parameters from file
 void read_params(const char* filename);

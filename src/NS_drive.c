@@ -1,8 +1,20 @@
 #include "NS_drive.h"
 
-void TransportVel(ComplexField *cv, ComplexField *ctv, RealField *v, Wavenumbers *kk){
+void EulerStepNS(fftw_complex *fieldOLD, fftw_complex *fieldNew, fftw_complex *fieldNL, double dtt){
+    int N = Nx * Ny * (Nz/2+1);
+
+    #pragma omp parallel for 
+    for (size_t i = 0; i < N; i++){
+        fieldNew[i][0] = fieldOLD[i][0] - dtt * fieldNL[i][0]; 
+        fieldNew[i][1] = fieldOLD[i][1] - dtt * fieldNL[i][1]; 
+    }
+
+}
+
+
+void TransportVel(ComplexField *ctv, ComplexField *cv, RealField *v, Wavenumbers *kk){
     
-    // Compute the non-linear advection term in Fourier space
+    // Compute the non-linear advection terms in Fourier space
     Transport(ctv->x, cv->x, v, kk);
     Transport(ctv->y, cv->y, v, kk);
     Transport(ctv->z, cv->z, v, kk);
@@ -105,26 +117,24 @@ void Proj(ComplexField *cv, Wavenumbers *kk){
 }
 
 void add_visc(ComplexField *ctv, ComplexField *cv, Wavenumbers *kk){
-    
-
     #pragma omp parallel for collapse(3)
-    for (size_t i = 0; i < Nx; i++)
-    for (size_t j = 0; j < Ny; j++)
-    for (size_t k = 0; k < Nz; k++){
-        int idx = (i*Ny + j) * Nz + k;
+    for (size_t i = 0; i < kk->Nx; i++)
+    for (size_t j = 0; j < kk->Ny; j++)
+    for (size_t k = 0; k < kk->Nz; k++){
+        int idx = (i*Ny + j) * (kk->Nz) + k;
 
         double kx = kk->kx[i];
         double ky = kk->ky[j];
         double kz = kk->kz[k];
         double k2 = kx*kx + ky*ky + kz*kz ;
 
-        ctv->x[idx][0] -=  nu * k2 * cv->x[idx][0];
-        ctv->x[idx][1] -=  nu * k2 * cv->x[idx][1];
+        ctv->x[idx][0] +=  nu * k2 * cv->x[idx][0];
+        ctv->x[idx][1] +=  nu * k2 * cv->x[idx][1];
 
-        ctv->y[idx][0] -=  nu * k2 * cv->y[idx][0];
-        ctv->y[idx][1] -=  nu * k2 * cv->y[idx][1];
+        ctv->y[idx][0] +=  nu * k2 * cv->y[idx][0];
+        ctv->y[idx][1] +=  nu * k2 * cv->y[idx][1];
 
-        ctv->z[idx][0] -=  nu * k2 * cv->z[idx][0];
-        ctv->z[idx][1] -=  nu * k2 * cv->z[idx][1];
+        ctv->z[idx][0] +=  nu * k2 * cv->z[idx][0];
+        ctv->z[idx][1] +=  nu * k2 * cv->z[idx][1];
     } 
 }

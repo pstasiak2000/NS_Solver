@@ -12,8 +12,6 @@ int main() {
     
     int N = Nx * Ny * Nz;
 
-
-
     printf("\n");
     printf("|----------------------------------------------------|\n");
     printf("|--- Running pseudo-spectral Navier-Stokes solver ---|\n");
@@ -23,7 +21,7 @@ int main() {
     printf("Available processors: %d\n", omp_get_num_procs());
 
     read_params("parameterNS.txt");
-    
+
     Lx *= 2*M_PI;
     Ly *= 2*M_PI;
     Lz *= 2*M_PI;
@@ -37,6 +35,7 @@ int main() {
     // FFTW outputs: Complex arrays of size NX * NY * (NZ/2 + 1)
     ComplexField *cv = create_complex_field(Nx,Ny,Nz);     
     ComplexField *ctv = create_complex_field(Nx,Ny,Nz);
+    ComplexField *ctv_rk1 = create_complex_field(Nx,Ny,Nz);
 
     // Create the wavenumbers
     Wavenumbers *kk = create_wavenumbers(Nx,Ny,Nz,Lx,Ly,Lz);
@@ -45,12 +44,32 @@ int main() {
     set_initial_condition(v, init_cond);
     execute_fftw_PS(kk->plan_PS, v, cv);
 
-    for (size_t it = 0; it < 1; it++)
-    {
-        TransportVel(cv,ctv,v,kk);
+    for (size_t it = 0; it < steps; it++)
+    {   
+    // First Runge-Kutta step
+        TransportVel(ctv,cv,v,kk);
+        add_visc(ctv, cv, kk);
+
+        EulerStepNS(cv->x, ctv_rk1->x, ctv->x, 0.5*dt);
+        EulerStepNS(cv->y, ctv_rk1->y, ctv->y, 0.5*dt);
+        EulerStepNS(cv->z, ctv_rk1->z, ctv->z, 0.5*dt);
+
+    // Second Runge-Kutta step
+        execute_fftw_SP(kk->plan_SP, ctv_rk1, v);
+
+        TransportVel(ctv_rk1, ctv, v, kk);
+        add_visc(ctv, ctv_rk1, kk);
+
+        EulerStepNS(cv->x, cv->x, ctv->x, dt);
+        EulerStepNS(cv->y, cv->y, ctv->y, dt);
+        EulerStepNS(cv->z, cv->z, ctv->z, dt);
+
+        execute_fftw_SP(kk->plan_SP,cv,v);
+
         printf("%d\n",it);
     }
-    
+
+    save_vecfield_2_bin(v,0);
 
     // printf("Max value = %f\n", max(dot_product_c2r(cv,cv),kk->Nx,kk->Ny,kk->Nz));
 

@@ -27,4 +27,4 @@ $(NAME)_debug: $(OBJS)
 
 # --- Clean up ---
 clean:
-	rm -f $(OBJS) $(NAME) $(NAME)_debugF
+	rm -f *.o

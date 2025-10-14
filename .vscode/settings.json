@@ -9,6 +9,7 @@
         "output.h": "c",
         "outputs.h": "c",
         "ns_drive.h": "c",
-        "project.h": "c"
+        "project.h": "c",
+        "math.h": "c"
     }
 }
