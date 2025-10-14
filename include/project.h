@@ -3,6 +3,7 @@
 
 #include <fftw3.h>
 
+#include "params.h"
 #include "fields.h"
 #include "wavenumbers.h"
 #include "IC.h"

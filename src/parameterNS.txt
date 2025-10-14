@@ -16,5 +16,5 @@ steps=1 // Number of steps
 //  [1]  --- Taylor-Green flow
 //  [2]  --- ABC flow
 //
-init_cond = 2 // Set the initial condition here
-shots = 100 // Save every shots
+init_cond=1 // Set the initial condition here
+shots=100 // Save every shots

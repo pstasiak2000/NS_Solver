@@ -23,7 +23,7 @@ int main() {
     printf("Available processors: %d\n", omp_get_num_procs());
 
     read_params("parameterNS.txt");
-
+    
     Lx *= 2*M_PI;
     Ly *= 2*M_PI;
     Lz *= 2*M_PI;

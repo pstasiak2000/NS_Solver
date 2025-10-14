@@ -9,7 +9,7 @@ double Lx = 1.0, Ly = 1.0, Lz = 1.0;
 double nu = 0.04;
 double dt = 0.0001;
 int steps = 1;
-int init_cond = 2;
+int init_cond = 0;
 int shots = 1;
 
 
