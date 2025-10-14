@@ -42,9 +42,9 @@ filename_pvd = "Vel"
 steps = 0
 
 # Resolution
-Nx =128 
-Ny =128 
-Nz =128 
+Nx =32 
+Ny =32 
+Nz =32 
 
 # Slab to cut
 nslab = 65   

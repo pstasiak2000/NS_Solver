@@ -44,32 +44,45 @@ int main() {
     set_initial_condition(v, init_cond);
     execute_fftw_PS(kk->plan_PS, v, cv);
 
+    save_vecfield_2_bin(v,0);
+
     for (size_t it = 0; it < steps; it++)
-    {   
-    // First Runge-Kutta step
-        TransportVel(ctv,cv,v,kk);
-        add_visc(ctv, cv, kk);
+    {
+        double max_value = sqrt(max(dot_product_c2r(cv,cv),kk->Nx,kk->Ny,kk->Nz));
+        printf("%3d | v_max = %f \n ",it, max_value);
 
-        EulerStepNS(cv->x, ctv_rk1->x, ctv->x, 0.5*dt);
-        EulerStepNS(cv->y, ctv_rk1->y, ctv->y, 0.5*dt);
-        EulerStepNS(cv->z, ctv_rk1->z, ctv->z, 0.5*dt);
-
-    // Second Runge-Kutta step
-        execute_fftw_SP(kk->plan_SP, ctv_rk1, v);
-
-        TransportVel(ctv_rk1, ctv, v, kk);
-        add_visc(ctv, ctv_rk1, kk);
+        //     TransportVel(ctv,cv,v,kk);
+        add_visc(ctv, cv, kk);        
 
         EulerStepNS(cv->x, cv->x, ctv->x, dt);
         EulerStepNS(cv->y, cv->y, ctv->y, dt);
         EulerStepNS(cv->z, cv->z, ctv->z, dt);
 
-        execute_fftw_SP(kk->plan_SP,cv,v);
 
-        printf("%d\n",it);
+    // // First Runge-Kutta step
+    //     TransportVel(ctv,cv,v,kk);
+    //     add_visc(ctv, cv, kk);        
+
+    //     EulerStepNS(cv->x, ctv_rk1->x, ctv->x, 0.5*dt);
+    //     EulerStepNS(cv->y, ctv_rk1->y, ctv->y, 0.5*dt);
+    //     EulerStepNS(cv->z, ctv_rk1->z, ctv->z, 0.5*dt);
+
+    // // Second Runge-Kutta step
+    //     execute_fftw_SP(kk->plan_SP, ctv_rk1, v);
+
+    //     TransportVel(ctv_rk1, ctv, v, kk);
+    //     add_visc(ctv, ctv_rk1, kk);
+
+    //     EulerStepNS(cv->x, cv->x, ctv->x, dt);
+    //     EulerStepNS(cv->y, cv->y, ctv->y, dt);
+    //     EulerStepNS(cv->z, cv->z, ctv->z, dt);
+
+    //     execute_fftw_SP(kk->plan_SP,cv,v);
+
+
     }
 
-    save_vecfield_2_bin(v,0);
+    
 
     // printf("Max value = %f\n", max(dot_product_c2r(cv,cv),kk->Nx,kk->Ny,kk->Nz));
 

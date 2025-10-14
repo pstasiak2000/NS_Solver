@@ -1,4 +1,5 @@
 #include "NS_drive.h"
+#include "field_ops.h"
 
 void EulerStepNS(fftw_complex *fieldOLD, fftw_complex *fieldNew, fftw_complex *fieldNL, double dtt){
     int N = Nx * Ny * (Nz/2+1);
@@ -13,7 +14,7 @@ void EulerStepNS(fftw_complex *fieldOLD, fftw_complex *fieldNew, fftw_complex *f
 
 
 void TransportVel(ComplexField *ctv, ComplexField *cv, RealField *v, Wavenumbers *kk){
-    
+        
     // Compute the non-linear advection terms in Fourier space
     Transport(ctv->x, cv->x, v, kk);
     Transport(ctv->y, cv->y, v, kk);

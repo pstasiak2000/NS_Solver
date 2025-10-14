@@ -128,7 +128,7 @@ void compute_curl_fftw(ComplexField *comega, ComplexField *cv, Wavenumbers *kk){
 }
 
 // Compute the gradient of f_x
-void Dx(fftw_complex *Aout, fftw_complex *Ain, Wavenumbers *kk){
+void Dx(fftw_complex *Ain, fftw_complex *Aout, Wavenumbers *kk){
 
     #pragma omp parallel for collapse(3)
     for (size_t i = 0; i < kk->Nx; i++)
@@ -144,7 +144,7 @@ void Dx(fftw_complex *Aout, fftw_complex *Ain, Wavenumbers *kk){
 }
 
 // Compute the gradient of f_x
-void Dy(fftw_complex *Aout, fftw_complex *Ain, Wavenumbers *kk){
+void Dy(fftw_complex *Ain, fftw_complex *Aout, Wavenumbers *kk){
 
     #pragma omp parallel for collapse(3)
     for (size_t i = 0; i < kk->Nx; i++)
@@ -160,7 +160,7 @@ void Dy(fftw_complex *Aout, fftw_complex *Ain, Wavenumbers *kk){
 }
 
 // Compute the gradient of f_x
-void Dz(fftw_complex *Aout, fftw_complex *Ain, Wavenumbers *kk){
+void Dz(fftw_complex *Ain, fftw_complex *Aout, Wavenumbers *kk){
 
     #pragma omp parallel for collapse(3)
     for (size_t i = 0; i < kk->Nx; i++)

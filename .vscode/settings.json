@@ -10,6 +10,7 @@
         "outputs.h": "c",
         "ns_drive.h": "c",
         "project.h": "c",
-        "math.h": "c"
+        "math.h": "c",
+        "field_ops.h": "c"
     }
 }
