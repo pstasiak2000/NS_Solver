@@ -17,4 +17,4 @@ steps=100 // Number of steps
 //  [2]  --- ABC flow
 //
 init_cond=1 // Set the initial condition here
-shots=100 // Save every shots
+shots=1 // Save every shots

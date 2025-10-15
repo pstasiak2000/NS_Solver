@@ -39,7 +39,7 @@ folder_fields = "./"
 filename_pvd = "Vel"
 
 # steps to convert
-steps = 0
+steps = 0:100
 
 # Resolution
 Nx =32 
@@ -94,7 +94,7 @@ for it in steps
 #    timefileUnit = FortranFile(folder_fields * "tt.$itstr.dat", "r", access="direct", recl=8)
 #    tt = read(timefileUnit,rec=1, Float64)
 #    close(timefileUnit)
-    tt = 0.0#round(tt, digits=3)
+    tt = it#round(tt, digits=3)
         
         # vtkfile["Time"] = tt
     vtkfile["Velocity"] = (Vx, Vy, Vz)

@@ -44,14 +44,14 @@ Wavenumbers *create_wavenumbers(size_t Nx, size_t Ny, size_t Nz, double Lx, doub
     kk->Nz = Nz/2+1;
 
     // Define dummy arrays for the real and complex to define the plans within the wavenumbers structure
-    double *v = malloc(Nx*Ny*Nz * sizeof(double));
-    if(!v) return NULL;
-    fftw_complex *cv = fftw_malloc(sizeof(fftw_complex) * Nx * Ny * (kk->Nz));  
-    if(!cv) return NULL;
+    double *Atemp = fftw_malloc(Nx*Ny*Nz * sizeof(double));
+    if(!Atemp) return NULL;
+    fftw_complex *Ctemp = fftw_malloc(sizeof(fftw_complex) * Nx * Ny * (kk->Nz));  
+    if(!Ctemp) return NULL;
 
     // Define the plans here and then free the arrays to save space
-    kk->plan_PS = fftw_plan_dft_r2c_3d(Nx, Ny, Nz, v, cv, FFTW_ESTIMATE);
-    kk->plan_SP = fftw_plan_dft_c2r_3d(Nx, Ny, Nz, cv, v, FFTW_ESTIMATE);
+    kk->plan_PS = fftw_plan_dft_r2c_3d(Nx, Ny, Nz, Atemp, Ctemp, FFTW_ESTIMATE);
+    kk->plan_SP = fftw_plan_dft_c2r_3d(Nx, Ny, Nz, Ctemp, Atemp, FFTW_ESTIMATE);
 
     // Assign memory for the wavenumbers
     kk->kx = malloc(kk->Nx * sizeof(double));
@@ -73,11 +73,11 @@ Wavenumbers *create_wavenumbers(size_t Nx, size_t Ny, size_t Nz, double Lx, doub
     for (size_t i = 0; i < kk->Nz; i++) // Allocate kz
         kk->kz[i] = TWO_PI * i / Lz;
      
-    free(v);
-    free(cv);
+    fftw_free(Atemp);
+    fftw_free(Ctemp);
 
     // Define the wave-vectors to kill for de-aliasing
-    kk->kill = calloc(sizeof(double),Nx*Ny*(Nz/2+1));
+    kk->kill = calloc(Nx*Ny*(Nz/2+1),sizeof(double));
     if(!kk->kill) return NULL;
 
     for (size_t i = 0; i < kk->Nx; i++)

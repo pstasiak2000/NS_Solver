@@ -35,7 +35,7 @@ int main() {
     // FFTW outputs: Complex arrays of size NX * NY * (NZ/2 + 1)
     ComplexField *cv = create_complex_field(Nx,Ny,Nz);     
     ComplexField *ctv = create_complex_field(Nx,Ny,Nz);
-    ComplexField *ctv_rk1 = create_complex_field(Nx,Ny,Nz);
+    // ComplexField *ctv_rk1 = create_complex_field(Nx,Ny,Nz);
 
     // Create the wavenumbers
     Wavenumbers *kk = create_wavenumbers(Nx,Ny,Nz,Lx,Ly,Lz);
@@ -44,14 +44,22 @@ int main() {
     set_initial_condition(v, init_cond);
     execute_fftw_PS(kk->plan_PS, v, cv);
 
-    save_vecfield_2_bin(v,0);
-
-    for (size_t it = 0; it < steps; it++)
+    // 
+    printf("---------------------------\n");
+    int it_shots = 0;
+    for (size_t it = 0; it <= steps; it++)
     {
-        double max_value = sqrt(max(dot_product_c2r(cv,cv),kk->Nx,kk->Ny,kk->Nz));
-        printf("%3d | v_max = %f \n ",it, max_value);
+        execute_fftw_PS(kk->plan_PS,v,cv);
 
-        //     TransportVel(ctv,cv,v,kk);
+        if(it % shots == 0){    
+            double max_value = sqrt(max(dot_product_r2r(v,v),kk->Nx,kk->Ny,kk->Nz));
+            double Reyn = max_value * Lx / nu;
+            printf("| %2d | v_max = %10.5f | Re = %10.2f\n",it_shots, max_value, Reyn);
+            save_vecfield_2_bin(v,it_shots);
+            ++it_shots;
+        }
+
+        TransportVel(ctv,cv,v,kk);
         add_visc(ctv, cv, kk);        
 
         EulerStepNS(cv->x, cv->x, ctv->x, dt);
@@ -77,7 +85,7 @@ int main() {
     //     EulerStepNS(cv->y, cv->y, ctv->y, dt);
     //     EulerStepNS(cv->z, cv->z, ctv->z, dt);
 
-    //     execute_fftw_SP(kk->plan_SP,cv,v);
+        execute_fftw_SP(kk->plan_SP,cv,v);
 
 
     }
