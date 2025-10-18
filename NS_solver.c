@@ -9,7 +9,7 @@
 
 
 int main() {
-    
+    double t = 0.0;
     int N = Nx * Ny * Nz;
 
     printf("\n");
@@ -22,10 +22,14 @@ int main() {
 
     read_params("parameterNS.txt");
     create_file_structure();
-    
+
     Lx *= 2*M_PI;
     Ly *= 2*M_PI;
     Lz *= 2*M_PI;
+
+    double dx = (double) Lx / Nx;
+    double dy = (double) Ly / Ny;
+    double dz = (double) Lz / Nz;
 
     printf("Domain size is (%f,%f,%f)\n", Lx, Ly, Lz);
 
@@ -46,16 +50,38 @@ int main() {
     execute_fftw_PS(kk->plan_PS, v, cv);
 
     // 
-    printf("---------------------------\n");
+    printf("-----------------------------------------------------\n");
+    printf("| it |   t   |   v_max  |   v_avg  |   CFL  |   Re  |\n");
+    printf("-----------------------------------------------------\n");
     int it_shots = 0;
     for (size_t it = 0; it <= steps; it++)
     {
         execute_fftw_PS(kk->plan_PS,v,cv);
 
-        if(it % shots == 0){    
-            double max_value = sqrt(max(dot_product_r2r(v,v),Nx,Ny,Nz));
-            double Reyn = max_value * Lx / nu;
-            printf("| %2d | v_max = %10.5f | Re = %10.2f\n",it_shots, max_value, Reyn);
+        if(it % shots == 0){
+            double *v_mag = sqrt_field(dot_product_r2r(v,v),N);
+
+            double v_max = max(v_mag,N);
+            double v_avg = mean(v_mag,N);
+            double CFL_x = compute_CFL(v_max, dx, dt);
+            double CFL_y = compute_CFL(v_max, dy, dt);
+            double CFL_z = compute_CFL(v_max, dz, dt);
+
+            double CFL = max((double[]){CFL_x, CFL_y, CFL_z},3);
+
+            double Reyn = v_avg * mean((double[]){Lx,Ly,Lz},3) / nu;
+            printf("| %2d | %5.3f | %8.5f | %8.5f | %5.4f | %5.0f |\n", it_shots, t, v_max, v_avg, CFL, Reyn);
+            free(v_mag);
+
+            double *Ekin3D = dot_product_c2r(cv,cv);
+
+            // Save spectrum data
+            double *spEk = spec1D(Ekin3D, kk);
+            save_spectrum("spEk.dat", spEk, Nx);
+            free(Ekin3D); free(spEk);
+            
+
+            // Save outputs to field
             save_vecfield_2_bin(v,it_shots);
             ++it_shots;
         }
@@ -88,9 +114,9 @@ int main() {
 
         execute_fftw_SP(kk->plan_SP,cv,v);
 
-
+        t += dt;
     }
-
+    printf("-----------------------------------------------------\n");
     
 
     // printf("Max value = %f\n", max(dot_product_c2r(cv,cv),kk->Nx,kk->Ny,kk->Nz));

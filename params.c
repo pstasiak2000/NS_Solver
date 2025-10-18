@@ -50,7 +50,6 @@ void read_params(const char* filename) {
         if (sscanf(line, "nu=%lf", &nu) == 1) continue;
         if (sscanf(line, "dt=%lf", &dt) == 1) continue;
     }
-    printf("Directory is %s\n",dire);
     fclose(file);
 }
 

@@ -1,10 +1,10 @@
 #include "field_ops.h"
 #include <stdlib.h>
 #include <omp.h>
+#include <math.h>
 
 // Finds the maximum value of a field
-double max(double *f, size_t Nx, size_t Ny, size_t Nz){
-    size_t N = Nx*Ny*Nz;
+double max(double *f, size_t N){
     if (N == 0) return 0.0; // avoid empty array
 
     double a = f[0];
@@ -14,7 +14,25 @@ double max(double *f, size_t Nx, size_t Ny, size_t Nz){
     return a;
 }
 
+// Find the average value of the field
+double mean(double *f, size_t N){
+    double C = 0;
+    #pragma omp parallel for reduction(+:C)
+    for (size_t i = 0; i < N; i++)
+        C += f[i];
+    return C /= N;
+}
 
+double *sqrt_field(double *f, size_t N){
+    double *f_sqrt = malloc(sizeof(double) * N);
+
+    #pragma omp parallel for
+    for (size_t i = 0; i < N; i++)
+        f_sqrt[i] = sqrt(f[i]);
+    
+
+    return f_sqrt;
+}   
 
 // Input two real fields and compute the dot product 
 double *dot_product_r2r(RealField *A, RealField *B){

@@ -17,5 +17,8 @@ void Dx(fftw_complex *Aout, fftw_complex *Ain, Wavenumbers *kk);
 void Dy(fftw_complex *Aout, fftw_complex *Ain, Wavenumbers *kk);
 void Dz(fftw_complex *Aout, fftw_complex *Ain, Wavenumbers *kk);
 
-double max(double *f, size_t Nx, size_t Ny, size_t Nz);
+double max(double *f, size_t N);
+double mean(double *f, size_t N);
+double *sqrt_field(double *f, size_t N);
+
 #endif
