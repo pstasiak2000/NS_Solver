@@ -32,7 +32,8 @@ int main() {
     if(dt>dt_max){
 	printf("ERROR: timestep is too large - %f>%f", dt, dt_max);
 	abort();
-    } 
+    }
+
     printf("Timestep passed: dt = %f < %f\n", dt, dt_max);
 
     // Allocate the memory for the real 3D fields here
@@ -52,9 +53,9 @@ int main() {
     execute_fftw_PS(kk->plan_PS, v, cv);
 
     printf("Executing loop...\n");
-    printf("--------------------------------------------------------------------------\n");
-    printf("| it |   t   |   v_max  |   v_avg  |   Re   |   eps   |    eta  |   CFL  |\n");
-    printf("--------------------------------------------------------------------------\n");
+    printf("--------------------------------------------------------------------------------------\n");
+    printf("| it |   t   |   v_max  |   v_avg  |   Re   |   eps   |    eta  |   CFL  | dt/dt_max |\n");
+    printf("--------------------------------------------------------------------------------------\n");
     int it_shots = 0;
     for (size_t it = 0; it <= steps; it++)
     {
@@ -84,8 +85,10 @@ int main() {
             free(Ekin3D); free(spEk);
             
             double eta = pow(pow(nu,3)/eps,0.25); // Computes the Kolmogorov length scale
+            dt_max = max((double[]){dx,dy,dz},3) / v_avg; // Computes the max timestep based on avg vel
 
-            printf("| %2d | %5.3f | %8.5f | %8.5f | %6.1f | %6.5f | %6.5f | %5.4f |\n", it_shots, t, v_max, v_avg, Reyn, eps, eta, CFL);
+
+            printf("| %2d | %5.3f | %8.5f | %8.5f | %6.1f | %6.5f | %6.5f | %5.4f |   %6.4f  | \n", it_shots, t, v_max, v_avg, Reyn, eps, eta, CFL, dt/dt_max);
 
             // Save global quantities
             save_global("CFL.dat", CFL, t);   // Save the CFL output
