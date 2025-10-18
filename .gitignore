@@ -8,3 +8,6 @@
 *.pvd
 *.log 
 *.out
+
+#Ignore anything in outputs
+/OUTPUTS*
