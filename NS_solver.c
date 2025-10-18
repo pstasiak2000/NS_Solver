@@ -28,7 +28,12 @@ int main() {
     double dy = (double) Ly / Ny;
     double dz = (double) Lz / Nz;
 
-    
+    double dt_max = (dx*dx) / (2 * nu);
+    if(dt>dt_max){
+	printf("ERROR: timestep is too large - %f>%f", dt, dt_max);
+	abort();
+    } 
+    printf("Timestep passed: dt = %f < %f\n", dt, dt_max);
 
     // Allocate the memory for the real 3D fields here
     RealField *v = create_real_field(Nx,Ny,Nz);
