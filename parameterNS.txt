@@ -10,7 +10,7 @@ Lx=1.0
 Ly=1.0
 Lz=1.0
 
-nu=0.04 // Numerical viscosity
+nu=0.01 // Numerical viscosity
 dt=0.001 // Step size
 steps=10 // Number of steps 
 
