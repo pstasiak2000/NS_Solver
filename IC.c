@@ -3,6 +3,8 @@
 #include <stdio.h>
 
 void set_initial_condition(RealField *f, int init_cond){
+    printf("=== INITIAL CONDITION ===\n");
+
     switch(init_cond) {
         case 1:
             printf("Taylor-Green flow initial condition\n");
@@ -16,7 +18,7 @@ void set_initial_condition(RealField *f, int init_cond){
             printf("Unknown initial condition: %d\n", init_cond);
             break;
     }
-
+    printf("\n");
 }
 // Creates a Taylor-Green initial vector field
 void init_TG(RealField *f){

@@ -12,7 +12,7 @@ void create_file_structure(){
     char path[64];
 
     sprintf(path,"%sOUTPUTS",dire);
-    printf("Generating file structure in %s\n",dire);
+    // printf("Generating file structure in %s\n",dire);
     mkdir(path, 0700); //Create outputs folder
 
     sprintf(path,"%sOUTPUTS/fields",dire);
@@ -52,6 +52,16 @@ void save_vecfield_2_bin(RealField *f, size_t i){
     fclose(fvz);
 }
 
+void save_global(const char *filename, double A, double t){
+    FILE *fptr;
+    char fullpath[64];
+
+    snprintf(fullpath, sizeof(fullpath), "%sOUTPUTS/global/%s",dire,filename);
+    fptr = fopen(fullpath, "a");
+    fprintf(fptr,"%f %12.10f\n",t, A);
+    fclose(fptr);
+}
+
 void save_spectrum(const char *filename, double *f,  size_t N){
     FILE *fptr;
     char fullpath[64];
@@ -61,4 +71,5 @@ void save_spectrum(const char *filename, double *f,  size_t N){
     for (size_t i = 0; i < N; i++)
         fprintf(fptr, "%e", f[i]);
     fprintf(fptr, "\n");
+    fclose(fptr);
 }

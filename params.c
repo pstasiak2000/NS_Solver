@@ -3,6 +3,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <math.h>
 
 // Default values
 char dire[64] = "./";
@@ -51,5 +52,19 @@ void read_params(const char* filename) {
         if (sscanf(line, "dt=%lf", &dt) == 1) continue;
     }
     fclose(file);
+
+    Lx *= 2*M_PI;
+    Ly *= 2*M_PI;
+    Lz *= 2*M_PI;
+    
+    
+
+    printf("=== PARAMETERS ===\n");
+    printf("Box resolution is (%d,%d,%d)\n", Nx, Ny, Nz);
+    printf("Domain size is (%f,%f,%f)\n", Lx, Ly, Lz);
+    printf("Timestep size is %f\n", dt);
+    printf("The kinematic viscosity is %f\n", nu);
+    printf("Saving every %d timesteps\n", shots);
+    printf("\n");
 }
 

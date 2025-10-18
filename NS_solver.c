@@ -13,25 +13,22 @@ int main() {
     int N = Nx * Ny * Nz;
 
     printf("\n");
-    printf("|----------------------------------------------------|\n");
-    printf("|--- Running pseudo-spectral Navier-Stokes solver ---|\n");
-    printf("|----------------------------------------------------|\n");
+    printf("--------------------------------------------------------------------------\n");
+    printf("|------------- Running pseudo-spectral Navier-Stokes solver -------------|\n");
+    printf("--------------------------------------------------------------------------\n");
     printf("\n");
     printf("Max threads : %d\n", omp_get_max_threads());
     printf("Available processors: %d\n", omp_get_num_procs());
+    printf("\n");
 
     read_params("parameterNS.txt");
     create_file_structure();
-
-    Lx *= 2*M_PI;
-    Ly *= 2*M_PI;
-    Lz *= 2*M_PI;
 
     double dx = (double) Lx / Nx;
     double dy = (double) Ly / Ny;
     double dz = (double) Lz / Nz;
 
-    printf("Domain size is (%f,%f,%f)\n", Lx, Ly, Lz);
+    
 
     // Allocate the memory for the real 3D fields here
     RealField *v = create_real_field(Nx,Ny,Nz);
@@ -40,7 +37,7 @@ int main() {
     // FFTW outputs: Complex arrays of size NX * NY * (NZ/2 + 1)
     ComplexField *cv = create_complex_field(Nx,Ny,Nz);     
     ComplexField *ctv = create_complex_field(Nx,Ny,Nz);
-    // ComplexField *ctv_rk1 = create_complex_field(Nx,Ny,Nz);
+    ComplexField *ctv_rk1 = create_complex_field(Nx,Ny,Nz);
 
     // Create the wavenumbers
     Wavenumbers *kk = create_wavenumbers(Nx,Ny,Nz,Lx,Ly,Lz);
@@ -49,10 +46,10 @@ int main() {
     set_initial_condition(v, init_cond);
     execute_fftw_PS(kk->plan_PS, v, cv);
 
-    // 
-    printf("-----------------------------------------------------\n");
-    printf("| it |   t   |   v_max  |   v_avg  |   CFL  |   Re  |\n");
-    printf("-----------------------------------------------------\n");
+    printf("Executing loop...\n");
+    printf("--------------------------------------------------------------------------\n");
+    printf("| it |   t   |   v_max  |   v_avg  |   Re   |   eps   |    eta  |   CFL  |\n");
+    printf("--------------------------------------------------------------------------\n");
     int it_shots = 0;
     for (size_t it = 0; it <= steps; it++)
     {
@@ -60,9 +57,11 @@ int main() {
 
         if(it % shots == 0){
             double *v_mag = sqrt_field(dot_product_r2r(v,v),N);
-
+            
             double v_max = max(v_mag,N);
             double v_avg = mean(v_mag,N);
+            free(v_mag);
+
             double CFL_x = compute_CFL(v_max, dx, dt);
             double CFL_y = compute_CFL(v_max, dy, dt);
             double CFL_z = compute_CFL(v_max, dz, dt);
@@ -70,16 +69,24 @@ int main() {
             double CFL = max((double[]){CFL_x, CFL_y, CFL_z},3);
 
             double Reyn = v_avg * mean((double[]){Lx,Ly,Lz},3) / nu;
-            printf("| %2d | %5.3f | %8.5f | %8.5f | %5.4f | %5.0f |\n", it_shots, t, v_max, v_avg, CFL, Reyn);
-            free(v_mag);
 
-            double *Ekin3D = dot_product_c2r(cv,cv);
 
             // Save spectrum data
+            double *Ekin3D = dot_product_c2r(cv,cv);
             double *spEk = spec1D(Ekin3D, kk);
             save_spectrum("spEk.dat", spEk, Nx);
+            double eps = compute_dissipation_spectral(spEk, kk);
             free(Ekin3D); free(spEk);
             
+            double eta = pow(pow(nu,3)/eps,0.25); // Computes the Kolmogorov length scale
+
+            printf("| %2d | %5.3f | %8.5f | %8.5f | %6.1f | %6.5f | %6.5f | %5.4f |\n", it_shots, t, v_max, v_avg, Reyn, eps, eta, CFL);
+
+            // Save global quantities
+            save_global("CFL.dat", CFL, t);   // Save the CFL output
+            save_global("Reyn.dat", Reyn, t); // Save the Reynolds number out
+            save_global("eps.dat", eps, t);   // Save the CFL output
+            save_global("eta.dat", eta, t); // Save the Reynolds number out
 
             // Save outputs to field
             save_vecfield_2_bin(v,it_shots);
@@ -116,7 +123,7 @@ int main() {
 
         t += dt;
     }
-    printf("-----------------------------------------------------\n");
+    printf("--------------------------------------------------------------------------\n");
     
 
     // printf("Max value = %f\n", max(dot_product_c2r(cv,cv),kk->Nx,kk->Ny,kk->Nz));
@@ -138,6 +145,7 @@ int main() {
     //  Clean up
     free_real_field(v); free_real_field(tv);
     free_complex_field(cv); free_complex_field(ctv);
+    free_complex_field(ctv_rk1);
 
     free_wavenumbers(kk);
 

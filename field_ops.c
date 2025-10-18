@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <omp.h>
 #include <math.h>
+#include "params.h"
 
 // Finds the maximum value of a field
 double max(double *f, size_t N){
@@ -191,4 +192,12 @@ void Dz(fftw_complex *Ain, fftw_complex *Aout, Wavenumbers *kk){
         Aout[idx][0] = -kz * Ain[idx][1];
         Aout[idx][1] =  kz * Ain[idx][0];
     }
+}
+// Use the kinetic energy spectrum to compute the mean energy dissipation rate
+double compute_dissipation_spectral(double *spEk, Wavenumbers *kk){
+    double eps = 0.0;
+    for (size_t ik = 0; ik < kk->Nx; ik++)
+        eps += 2.0 * nu * (ik*ik) * spEk[ik];
+    
+    return eps;
 }

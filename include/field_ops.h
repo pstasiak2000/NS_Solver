@@ -12,6 +12,7 @@ double sum_3D_field(double *A, size_t Nx, size_t Ny, size_t Nz);
 double dot_product_2_sum(RealField *A, RealField *B);
 
 void compute_curl_fftw(ComplexField *comega, ComplexField *cv, Wavenumbers *kk);
+double compute_dissipation_spectral(double *spEk, Wavenumbers *kk);
 
 void Dx(fftw_complex *Aout, fftw_complex *Ain, Wavenumbers *kk);
 void Dy(fftw_complex *Aout, fftw_complex *Ain, Wavenumbers *kk);

@@ -111,18 +111,18 @@ double *spec1D(double *cf, Wavenumbers *kk){
     int Ny = kk->Ny;
     int Nz = kk->Nz;
 
+    spec[0] = cf[0]; 
     for (size_t i = 0; i < Nx; i++)
     for (size_t j = 0; j < Ny; j++)
     for (size_t k = 0; k < Nz; k++){
         int idx = (i*Ny + j) * Nz + k;
-        double fac = 2.0;
-        if(k==0) fac = 1.0;
+        double fac = (k == 0) ? 1.0 : 2.0;
 
         double kx = kk->kx[i];
         double ky = kk->ky[j];
         double kz = kk->kz[k];
         
-        double ks = pow((kx*kx) + (ky*ky) + (kz*kz),0.5);
+        double ks = sqrt((kx*kx) + (ky*ky) + (kz*kz));
         int iks = fmin(floor(ks)+1,Nz);
 
         spec[iks] += (double) 0.5 * fac *cf[idx];
