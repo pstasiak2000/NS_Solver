@@ -31,11 +31,13 @@ void init_TG(RealField *f){
         for (size_t j = 0; j < Ny; j++){
             for (size_t k = 0; k < Nz; k++){
                 int idx = (i*Ny + j) * Nz + k;
-                double x = (double) i / Nx;
-                double y = (double) j / Ny;
-                double z = (double) k / Nz;
-                f->x[idx] = sin(2*M_PI*x)*cos(2*M_PI*y)*cos(2*M_PI*z);
-                f->y[idx] = -cos(2*M_PI*x)*sin(2*M_PI*y)*cos(2*M_PI*z);
+                // Map i, j, k into [0, 2π]
+                double x = 2.0 * M_PI * i / Nx;
+                double y = 2.0 * M_PI * j / Ny;
+                double z = 2.0 * M_PI * k / Nz;
+
+                f->x[idx] = sin(x) * cos(y) * cos(z);
+                f->y[idx] = -cos(x) * sin(y) * cos(z);
                 f->z[idx] = 0.0;
             }
         }
