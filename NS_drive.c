@@ -116,7 +116,7 @@ void Proj(ComplexField *cv, Wavenumbers *kk){
         cv->z[idx][1] -= kz * dive[idx][1] / k2;
     }
     
-    free_fftw(dive);
+    fftw_free(dive);
 }
 
 void add_visc(ComplexField *ctv, ComplexField *cv, Wavenumbers *kk){
