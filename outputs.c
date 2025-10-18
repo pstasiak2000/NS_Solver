@@ -1,6 +1,24 @@
 #include "outputs.h"
+#include <stdlib.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 
+void create_file_structure(){
+    char path[64];
 
+    sprintf(path,"%sOUTPUTS",dire);
+    printf("Generating file structure in %s\n",dire);
+    mkdir(path, 0700); //Create outputs folder
+
+    sprintf(path,"%sOUTPUTS/fields",dire);
+    mkdir(path, 0700); //Create outputs folder
+
+    sprintf(path,"%sOUTPUTS/spectral",dire);
+    mkdir(path, 0700); //Create outputs folder
+
+    sprintf(path,"cp parameterNS.txt %sOUTPUTS/parameterNS.txt_0",dire);
+    system(path);
+}
 
 // Save a vector field to binary 
 void save_vecfield_2_bin(RealField *f, size_t i){

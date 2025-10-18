@@ -2,8 +2,10 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <ctype.h>
 
 // Default values
+char dire[64] = "./";
 int Nx = 32, Ny = 32, Nz = 32;
 double Lx = 1.0, Ly = 1.0, Lz = 1.0;
 double nu = 0.04;
@@ -22,9 +24,10 @@ void read_params(const char* filename) {
 
     char line[256];
     while (fgets(line, sizeof(line), file)) {
-        // Remove comments
-        char* comment = strchr(line, '/');
-        if (comment) *comment = '\0';
+            // Remove comments safely (only if "//" follows whitespace)
+            char* comment = strstr(line, "//");
+            if (comment && (comment == line || isspace((unsigned char)*(comment - 1))))
+                *comment = '\0';
 
         // Skip empty lines
         char* p = line;
@@ -32,6 +35,7 @@ void read_params(const char* filename) {
         if (*p == '\0') continue;
 
         // Parse integer parameters
+        if (sscanf(line, "dire=%s", dire) == 1) continue;
         if (sscanf(line, "Nx=%d", &Nx) == 1) continue;
         if (sscanf(line, "Ny=%d", &Ny) == 1) continue;
         if (sscanf(line, "Nz=%d", &Nz) == 1) continue;
@@ -46,7 +50,7 @@ void read_params(const char* filename) {
         if (sscanf(line, "nu=%lf", &nu) == 1) continue;
         if (sscanf(line, "dt=%lf", &dt) == 1) continue;
     }
-
+    printf("Directory is %s\n",dire);
     fclose(file);
 }
 

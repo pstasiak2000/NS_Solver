@@ -1,6 +1,8 @@
 #ifndef PARAMS_H
 #define PARAMS_H
 
+extern char dire[];
+
 extern int Nx;
 extern int Ny;
 extern int Nz;
