@@ -16,10 +16,22 @@ int main() {
     printf("--------------------------------------------------------------------------\n");
     printf("|------------- Running pseudo-spectral Navier-Stokes solver -------------|\n");
     printf("--------------------------------------------------------------------------\n");
+    int nthreads = omp_get_max_threads();
+
     printf("\n");
-    printf("Max threads : %d\n", omp_get_max_threads());
+    printf("Max threads : %d\n", nthreads);
     printf("Available processors: %d\n", omp_get_num_procs());
+    
+    // Initialize FFTW threads - MUST BE CALLED
+    if (fftw_init_threads() == 0) {
+        fprintf(stderr, "FFTW thread initialization failed!\n");
+        return 1;
+    }
     printf("\n");
+
+    
+    fftw_plan_with_nthreads(nthreads);
+    printf("Using %d OpenMP threads for FFTW\n", nthreads);
 
     read_params("parameterNS.txt");
     create_file_structure();
@@ -156,7 +168,8 @@ int main() {
     free_complex_field(ctv_rk1);
 
     free_wavenumbers(kk);
-
+    fftw_cleanup_threads();
+    
     printf("Run finished successfully!\n");
     return 0;
 }
