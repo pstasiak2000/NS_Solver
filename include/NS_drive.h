@@ -7,8 +7,11 @@
 #include "field_ops.h"
 #include "wavenumbers.h"
 
-// Single Euler step
-void EulerStepNS(fftw_complex *fieldOLD, fftw_complex *fieldNew, fftw_complex *fieldNL, double dtt);
+// Euler step of field
+void EulerStep(ComplexField *fieldOLD, ComplexField *fieldNew, ComplexField *fieldNL, double dtt);
+
+// RK2 step of field
+void RK2Step(ComplexField *cv, ComplexField *ctv, ComplexField *ctv_rk1, RealField *v, Wavenumbers *kk, double dtt);
 
 // Compute the non-linear advection in fourier space
 void TransportVel(ComplexField *cv, ComplexField *ctv, RealField *v, Wavenumbers *kk);

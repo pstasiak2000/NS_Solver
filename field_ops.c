@@ -201,3 +201,26 @@ double compute_dissipation_spectral(double *spEk, Wavenumbers *kk){
     
     return eps;
 }
+
+
+void check_divergence(ComplexField *cv, Wavenumbers *kk, const char* label) {
+    double max_div = 0.0;
+    size_t Nx = kk->Nx, Ny = kk->Ny, Nz = kk->Nz;
+    
+    #pragma omp parallel for collapse(3) reduction(max:max_div)
+    for (size_t i = 0; i < Nx; i++)
+    for (size_t j = 0; j < Ny; j++)
+    for (size_t k = 0; k < Nz; k++) {
+        int idx = (i*Ny + j) * Nz + k;
+        double kx = kk->kx[i], ky = kk->ky[j], kz = kk->kz[k];
+        
+        // Compute divergence in spectral space
+        double div_re = kx*cv->x[idx][0] + ky*cv->y[idx][0] + kz*cv->z[idx][0];
+        double div_im = kx*cv->x[idx][1] + ky*cv->y[idx][1] + kz*cv->z[idx][1];
+        double div_mag = sqrt(div_re*div_re + div_im*div_im);
+        
+        max_div = fmax(max_div, div_mag);
+    }
+    
+    printf("%s: max divergence = %e\n", label, max_div);
+}

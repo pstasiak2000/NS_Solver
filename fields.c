@@ -7,9 +7,9 @@ RealField *create_real_field(size_t Nx, size_t Ny, size_t Nz){
     if (!f) return NULL;
 
     f->Nx = Nx; f->Ny = Ny; f->Nz = Nz;
-    f->x = calloc(Nx*Ny*Nz, sizeof(double));
-    f->y = calloc(Nx*Ny*Nz, sizeof(double));
-    f->z = calloc(Nx*Ny*Nz, sizeof(double));
+    f->x = fftw_alloc_real(Nx*Ny*Nz * sizeof(double));
+    f->y = fftw_alloc_real(Nx*Ny*Nz * sizeof(double));
+    f->z = fftw_alloc_real(Nx*Ny*Nz * sizeof(double));
 
     if (!f->x || !f->y || !f->z) {
         free(f->x); free(f->y); free(f->z); free(f);

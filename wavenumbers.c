@@ -24,8 +24,7 @@ void execute_fftw_PS(fftw_plan plan, RealField *f, ComplexField *cf){
         cf->x[i][0] /= N; cf->x[i][1] /= N;
         cf->y[i][0] /= N; cf->y[i][1] /= N;
         cf->z[i][0] /= N; cf->z[i][1] /= N;
-    }
-    
+    } 
 }
 
 void execute_fftw_SP(fftw_plan plan, ComplexField *cf, RealField *f){

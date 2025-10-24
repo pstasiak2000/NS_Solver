@@ -18,6 +18,8 @@ void Dx(fftw_complex *Aout, fftw_complex *Ain, Wavenumbers *kk);
 void Dy(fftw_complex *Aout, fftw_complex *Ain, Wavenumbers *kk);
 void Dz(fftw_complex *Aout, fftw_complex *Ain, Wavenumbers *kk);
 
+void check_divergence(ComplexField *cv, Wavenumbers *kk, const char* label);
+
 double max(double *f, size_t N);
 double mean(double *f, size_t N);
 double *sqrt_field(double *f, size_t N);
